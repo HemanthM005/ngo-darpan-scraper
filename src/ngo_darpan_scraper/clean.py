@@ -7,6 +7,7 @@ from typing import Any
 import pandas as pd
 
 _COLUMN_ALIASES = {
+    # server-rendered (legacy) headers
     "unique id": "unique_id",
     "unique_id": "unique_id",
     "ngo unique id": "unique_id",
@@ -19,6 +20,14 @@ _COLUMN_ALIASES = {
     "sectors working in": "sectors",
     "sector": "sectors",
     "sectors": "sectors",
+    # JSON API keys (lower-cased by _canon_key)
+    "uniqueid": "unique_id",
+    "regno": "unique_id",
+    "darpanid": "unique_id",
+    "ngoname": "ngo_name",
+    "voname": "ngo_name",
+    "orgname": "ngo_name",
+    "statename": "state",
 }
 
 _WS = re.compile(r"\s+")

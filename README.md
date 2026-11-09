@@ -20,11 +20,17 @@ KL/2020/0245678,Green Kerala Foundation,Kerala,Environment; Rural Development,"K
 
 ## The hard parts (and how it handles them)
 
+The site is an **Angular single-page app backed by a REST API under `/apis/`** —
+nothing useful is in the initial HTML. Verified live endpoints:
+`/apis/capis/sys-id` (session), `/apis/capis/mstr-states` (state list),
+`/apis/regis/...` (registry data).
+
 | Challenge | Approach |
 |-----------|----------|
-| **Captcha on search** | requests-first for speed; **Playwright fallback** lets a human clear the captcha once, then harvests every page |
-| **Scale** (36 states × many pages) | Iterates **state-by-state** so each query is small, resumable, and easy to rate-limit |
-| **Markup drift** (table vs. cards) | Parser prefers a `<table>` but falls back to positional parsing — survives redesigns |
+| **SPA + JSON API** (no HTML, no docs) | Establishes a session, resolves the site's own state ids from `mstr-states`, and reads the paginated search JSON directly |
+| **Captcha on search** | API-first for speed; **Playwright fallback** lets a human clear the captcha once |
+| **Scale** (36 states × many pages) | Iterates **state-by-state** so each query is small, resumable, rate-limited |
+| **Shape drift** | `_extract_json_rows` finds records by key-shape (recursive), plus a legacy HTML-table parser — survives redesigns (the site already migrated once) |
 | **Duplicates** | Single identity key (`unique_id`, else `name|state`) — avoids the NaN-equality trap that silently merges id-less rows |
 | **Trust** | **pandera** schema validates every record before anything is written |
 
@@ -32,11 +38,15 @@ KL/2020/0245678,Green Kerala Foundation,Kerala,Environment; Rural Development,"K
 
 ```
 scrape()  ─ state-by-state, paginated ─┐
-  ├─ fetch_via_requests (AJAX POST)     │
-  └─ fetch_via_browser  (captcha)       ├─► clean() ─► validate() ─► CSV
+  ├─ fetch_via_api     (/apis/ JSON)    │
+  └─ fetch_via_browser (captcha)        ├─► clean() ─► validate() ─► CSV
        raw rows                         │   normalise    pandera
                                         │   + de-dup     schema
 ```
+
+> **Note:** the one moving part is the search endpoint's exact slug + payload
+> (isolated in `config.SEARCH_PATH` / `scraper._search_payload`). Confirm it from
+> the browser Network tab — run one search, copy the `/apis/regis/...` request.
 
 ## Install
 

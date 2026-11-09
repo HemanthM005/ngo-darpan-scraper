@@ -9,9 +9,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+# NGO Darpan was rebuilt as an Angular SPA backed by a REST API under /apis/.
+# Verified live endpoints (GET):
+#   /apis/capis/sys-id                         -> session/system id
+#   /apis/capis/mstr-states?stateWithAll=true  -> master list of states (+ids)
+#   /apis/regis/summary/ngo                    -> registry summary counts
+# The paginated NGO *search* lives under /apis/regis/. Confirm its exact slug +
+# JSON payload from the browser Network tab (do one search, copy the request):
+# it is typically a POST like /apis/regis/ngo/search or /apis/regis/search.
 BASE_URL = "https://ngodarpan.gov.in"
-SEARCH_PATH = "/index.php/search/"          # public NGO search
-RESULTS_PATH = "/index.php/ajaxcontroller/search_index"  # paginated results
+SYS_ID_PATH = "/apis/capis/sys-id"
+STATES_PATH = "/apis/capis/mstr-states?stateWithAll=true"
+SEARCH_PATH = "/apis/regis/ngo/search"       # TODO: confirm against live Network tab
 
 # All States + UTs we iterate over. The site keys states by its own numeric
 # ids; the loader resolves the live id->name map at runtime, but this list is
@@ -31,8 +40,9 @@ STATES = (
 @dataclass(frozen=True)
 class ScraperConfig:
     base_url: str = BASE_URL
+    sys_id_path: str = SYS_ID_PATH
+    states_path: str = STATES_PATH
     search_path: str = SEARCH_PATH
-    results_path: str = RESULTS_PATH
     states: tuple[str, ...] = STATES
 
     # Politeness / resilience
