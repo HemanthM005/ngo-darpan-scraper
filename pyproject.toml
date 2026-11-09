@@ -1,0 +1,23 @@
+[project]
+name = "ngo-darpan-scraper"
+version = "1.0.0"
+description = "Scrape, clean and validate NGO records from India's NGO Darpan directory."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Manikala Hemanth" }]
+dependencies = ["requests>=2.31", "beautifulsoup4>=4.12", "pandas>=2.1", "pandera>=0.20"]
+
+[project.optional-dependencies]
+browser = ["playwright>=1.44"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+ngo-darpan = "ngo_darpan_scraper.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

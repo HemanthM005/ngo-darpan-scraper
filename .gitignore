@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.env
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Data outputs (keep sample_output/, ignore real runs)
+data/*.csv
+!data/sample_output/*.csv
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
